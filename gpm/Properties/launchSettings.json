@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "gpm": {
+      "commandName": "Project",
+      "commandLineArgs": "add mojoconsole-plus",
+      "workingDirectory": "D:\\Server\\Server-2.7-dev\\Grasscutter"
+    }
+  }
+}
