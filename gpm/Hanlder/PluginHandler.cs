@@ -27,11 +27,15 @@ namespace gpm.Hanlder
             return r;
         }
 
-
+        private static void EnsureInit()
+        {
+            EnvHandler.Init(false);
+        }
         
         
         public static async Task Add(List<string> pkgs)
         {
+            EnsureInit();
             var file = Path.GetFileName(repo);
 
             if (!File.Exists(Path.Combine(metadataDir, file)))
@@ -104,6 +108,7 @@ namespace gpm.Hanlder
 
         public static async Task Remove(List<string> pkgs)
         {
+            EnsureInit();
             DirectoryInfo directoryInfo = new DirectoryInfo(pluginDir);
             var plugins = directoryInfo.GetFiles();
             List<PluginInfoReader.PluginInfo> pluginInfos = new List<PluginInfoReader.PluginInfo>();
@@ -143,6 +148,8 @@ namespace gpm.Hanlder
 
         public static async Task Update()
         {
+            EnsureInit();
+
             MsgHelper.I($"Fetching metadata from {repo}");
             var file = Path.GetFileName(repo);
 
@@ -172,6 +179,7 @@ namespace gpm.Hanlder
         {
 
 
+            EnsureInit();
 
 
 
@@ -207,6 +215,9 @@ namespace gpm.Hanlder
 
         public static async Task List()
         {
+            EnsureInit();
+
+
             DirectoryInfo directoryInfo = new DirectoryInfo(pluginDir);
             var plugins = directoryInfo.GetFiles();
             List<PluginInfoReader.PluginInfo> pluginInfos= new List<PluginInfoReader.PluginInfo>(); ;

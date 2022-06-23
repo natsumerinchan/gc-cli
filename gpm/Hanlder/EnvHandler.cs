@@ -9,7 +9,7 @@ namespace gpm.Hanlder
     public static class EnvHandler
     {
 
-        public static void Init()
+        public static void Init(bool showDetail=true)
         {
 
             if (File.Exists(cfgDir))
@@ -20,6 +20,7 @@ namespace gpm.Hanlder
                 {
                     MsgHelper.W("Data dir not exist,Creating...");
 
+
                     Directory.CreateDirectory(dataDir);
 
 
@@ -28,7 +29,12 @@ namespace gpm.Hanlder
                 }
                 else
                 {
-                    MsgHelper.I("Already Inited");
+                    if (showDetail)
+                    {
+                        MsgHelper.I("Already Inited");
+
+                    }
+
 
                 }
 
@@ -37,6 +43,8 @@ namespace gpm.Hanlder
             else
             {
                 MsgHelper.E("此路径不是一个有效的gc目录,请运行 gcm install 来安装一个core！");
+                //throw new Exception("此目录不是一个gc目录。");
+                Environment.Exit(-1);
             }
 
 
