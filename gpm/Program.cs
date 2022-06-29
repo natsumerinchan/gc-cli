@@ -45,8 +45,10 @@ namespace gpm
         {
 
             var rootCommand = new RootCommand("Package Manager for GrassCutter");
-            
-            
+
+            var ProxyOption = new Option<bool>(
+                name: "-p",
+                description: "Enable Proxy in GPM.");
 
             var initCommand = new Command("init", "设定GC的工作目录")
             {
@@ -71,6 +73,12 @@ namespace gpm
 
             addCommand.AddArgument(addArgument);
             removeCommand.AddArgument(removeArgument);
+
+            //proxy
+            listrepoCommand.AddOption(ProxyOption);
+            updateCommand.AddOption(ProxyOption);
+            addCommand.AddOption(ProxyOption);
+
 
 
             initCommand.SetHandler(() => 

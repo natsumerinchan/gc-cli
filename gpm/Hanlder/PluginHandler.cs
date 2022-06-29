@@ -17,6 +17,10 @@ namespace gpm.Hanlder
 
     static class PluginHandler
     {
+
+        const string proxy = "https://ghproxy.com/";
+
+
         private static string List2Tags(List<string> tags)
         {
             var r = "";
@@ -32,8 +36,13 @@ namespace gpm.Hanlder
             EnvHandler.Init(false);
         }
         
+        public static string GetProxyString(string origin)
+        {
+
+            return $"{proxy}{origin}";
+        }
         
-        public static async Task Add(List<string> pkgs)
+        public static async Task Add(List<string> pkgs,bool Proxy=false)
         {
             EnsureInit();
             var file = Path.GetFileName(repo);
@@ -58,15 +67,15 @@ namespace gpm.Hanlder
 
                 if (temp==null)
                 {
-                    MsgHelper.E($"Can't found a plugin named {temp.name}");
+                    MsgHelper.E($"Can't found a package named {temp.name}");
                     continue;
                 }
                 var realeaseUrl = $"{GITHUB_API}/repos/{temp.github}/{temp.releases}";
 
                 MsgHelper.I($"Getting plugin realeaseinfo");
 
-
-                var response = await request.Get($"{GITHUB_API}/repos/{temp.github}/{temp.releases}");
+                //不需要代理
+                var response = await request.Get($"{GITHUB_API}/repos/{temp.github}/{temp.releases}",null,false);
                 var pluginInfo = JsonConvert.DeserializeObject<RealeaseInfo.Root>(response);
 
                 var downLoadUrl = pluginInfo.assets[0].browser_download_url;
@@ -95,7 +104,7 @@ namespace gpm.Hanlder
 
                         await FileDownLoader.DownloadFileData(downLoadUrl, Path.Combine(pluginDir, filep), delegate (int a) {
                             task1.Increment(a - task1.Percentage);
-                        });
+                        },Proxy);
 
                     });
 
@@ -145,8 +154,7 @@ namespace gpm.Hanlder
 
         }
 
-
-        public static async Task Update()
+        public static async Task Update(bool Proxy = false)
         {
             EnsureInit();
 
@@ -163,7 +171,7 @@ namespace gpm.Hanlder
 
                     await FileDownLoader.DownloadFileData(repo, Path.Combine(metadataDir, file), delegate (int a) {
                         task1.Increment(a - task1.Percentage);
-                    });
+                    },Proxy);
 
                 });
 
@@ -173,9 +181,7 @@ namespace gpm.Hanlder
 
         }
 
-
-
-        public static async Task ListRepo()
+        public static async Task ListRepo(bool Proxy = false)
         {
 
 

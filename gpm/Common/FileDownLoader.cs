@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using gpm.Hanlder;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,8 +18,19 @@ namespace gpm.Common
         /// <param name="URL">下载地址</param>
         /// <param name="filename">本地存储地址</param>
         /// <param name="action">委托回调函数</param>
-        public async static Task DownloadFileData(string URL, string filename, Action<int> action)
+        public async static Task DownloadFileData(string URL, string filename, Action<int> action,bool proxy)
         {
+            if (proxy)
+            {
+                URL = PluginHandler.GetProxyString(URL);
+            }
+            else
+            {
+
+            }
+
+
+
             if(!Directory.Exists(Path.GetDirectoryName(filename)))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(filename));

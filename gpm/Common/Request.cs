@@ -1,4 +1,5 @@
-﻿using System;
+﻿using gpm.Hanlder;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -50,8 +51,7 @@ namespace gpm
         /// <param name="url"></param>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public async Task<string> Get(string url, Dictionary<string, string> dic = null)
-
+        public async Task<string> Get(string url, Dictionary<string, string> dic = null,bool proxy=false)
         {
             HttpResponseMessage response;
             //参数添加
@@ -76,8 +76,16 @@ namespace gpm
 
             try
             {
-
-                response = await httpClient.GetAsync(new Uri(builder.ToString()));
+                Uri uri;
+                if (proxy)
+                {
+                    uri = new Uri(PluginHandler.GetProxyString(builder.ToString()));
+                }
+                else
+                {
+                    uri = new Uri(builder.ToString());
+                }
+                response = await httpClient.GetAsync(uri);
                 //Console.WriteLine("URL:" + url);
             }
             catch
