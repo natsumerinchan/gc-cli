@@ -160,10 +160,10 @@ namespace gpm.Hanlder
             AnsiConsole.Status()
                 .Start("Downloading file...", ctx =>
                 {
-                    //FileDownLoader.DownloadFileData(downLoadUrl, Path.Combine(resourceDir, filep), false);
+                    FileDownLoader.DownloadFileData(downLoadUrl, Path.Combine(resourceDir, filep), false);
 
                     ctx.Status = "Unpacking data...";
-                    //UnzipFile(Path.Combine(resourceDir, filep), resourceDir);
+                    UnzipFile(Path.Combine(resourceDir, filep), resourceDir);
 
                     ctx.Status = "Moving file...";
                     MoveFolder(Path.Combine(resourceDir, originPath), resourceDir);
@@ -175,7 +175,8 @@ namespace gpm.Hanlder
 
                     File.Delete(Path.Combine(resourceDir, filep));
 
-                    
+                    //DirectoryInfo di = new DirectoryInfo(Path.Combine(resourceDir, filep));
+                    //di.Delete();
 
                 });
 

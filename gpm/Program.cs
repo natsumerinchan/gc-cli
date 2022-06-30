@@ -76,21 +76,21 @@ namespace gpm
             var addArgument = new Argument<List<string>>(name:"要添加的包名" )
             {
                 Arity=ArgumentArity.OneOrMore
-            };
+            };  //完成
             var removeArgument = new Argument<List<string>>(name: "要删除的包名")
             {
                 Arity = ArgumentArity.OneOrMore
-            };
+            };  //完成
 
-            var addCommand = new Command("add", "添加插件");
-            var updateCommand = new Command("update", "更新插件仓库信息");
-            var listrepoCommand = new Command("listrepo", "列出仓库中的插件");
-            var removeCommand = new Command("remove", "删除已安装的插件");
-            var listCommand = new Command("list", "列出已安装的插件");
-            var installCommand = new Command("install", "在文件夹下安装GrassCutter");
-            var runCommand = new Command("run", "开启服务器");
-            var checkCommand = new Command("check", "检查运行环境");
-            var infoCommand = new Command("info", "列出所有信息");
+            var addCommand = new Command("add", "添加插件");  //完成
+            var updateCommand = new Command("update", "更新仓库信息");  //完成
+            var listrepoCommand = new Command("listrepo", "列出仓库中的插件");  //完成
+            var removeCommand = new Command("remove", "删除已安装的插件");  //完成
+            var listCommand = new Command("list", "列出已安装的插件");  //完成
+            var installCommand = new Command("install", "在文件夹下安装GrassCutter");  //完成
+            var runCommand = new Command("run", "开启服务器");  //咕咕
+            var checkCommand = new Command("check", "检查运行环境");  //咕咕
+            var infoCommand = new Command("info", "列出所有信息");    //咕咕
 
 
             addCommand.AddArgument(addArgument);
