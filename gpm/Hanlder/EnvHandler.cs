@@ -12,9 +12,9 @@ namespace gpm.Hanlder
         public static void Init(bool showDetail=true)
         {
 
-            if (File.Exists(cfgDir))
-            {
-                MsgHelper.I("Found config.json");
+            //if (File.Exists(cfgDir))
+            //{
+                //MsgHelper.I("Found config.json");
 
                 if (!Directory.Exists(dataDir))
                 {
@@ -39,15 +39,21 @@ namespace gpm.Hanlder
                 }
 
 
-            }
-            else
-            {
-                MsgHelper.E("此路径不是一个有效的gc目录,请运行 gcm install 来安装一个core！");
-                //throw new Exception("此目录不是一个gc目录。");
-                Environment.Exit(-1);
-            }
+            //}
+            //else
+            //{
+            //    MsgHelper.E("此路径不是一个有效的gc目录,请运行 gcm install 来安装一个core！");
+            //    //throw new Exception("此目录不是一个gc目录。");
+            //    Environment.Exit(-1);
+            //}
 
 
+        }
+
+
+        public static bool CheckConfigExists()
+        {
+            return File.Exists(cfgDir);
         }
     }
 }

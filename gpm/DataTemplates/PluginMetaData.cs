@@ -4,7 +4,7 @@ using System.Text;
 
 namespace gpm.DataTemplates
 {
-    public class MetaData
+    public class PluginMetaData
     {
             /// <summary>
             /// 

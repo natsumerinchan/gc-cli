@@ -18,7 +18,9 @@ namespace gpm.Hanlder
     static class PluginHandler
     {
 
-        const string proxy = "https://ghproxy.com/";
+        public const string REPO_URL = "https://raw.githubusercontent.com/gc-toolkit/GPM-Index/main/metadata/zh/gc-plugin/index.json";
+
+        public const string PROXY_URL = "https://ghproxy.com/";
 
 
         private static string List2Tags(List<string> tags)
@@ -39,15 +41,14 @@ namespace gpm.Hanlder
         public static string GetProxyString(string origin)
         {
 
-            return $"{proxy}{origin}";
+            return $"{PROXY_URL}{origin}";
         }
         
         public static async Task Add(List<string> pkgs,bool Proxy=false)
         {
             EnsureInit();
-            var file = Path.GetFileName(repo);
 
-            if (!File.Exists(Path.Combine(metadataDir, file)))
+            if (!File.Exists(Path.Combine(metadataDir, PLUGIN_METADATA_FILE)))
             {
                 MsgHelper.I("No metadata found in disk, please run [bold]gpm update[/] first");
                 return;
@@ -56,14 +57,14 @@ namespace gpm.Hanlder
             MsgHelper.I($"Reading cached metadata");
 
 
-            var raw_metaData = File.ReadAllText(Path.Combine(metadataDir, file));
+            var raw_metaData = File.ReadAllText(Path.Combine(metadataDir, PLUGIN_METADATA_FILE));
 
-            var metaData = JsonConvert.DeserializeObject<List<MetaData> >(raw_metaData);
+            var metaData = JsonConvert.DeserializeObject<List<PluginMetaData> >(raw_metaData);
             var request = new Request();
             var index = 0;
             foreach (var item in pkgs)
             {
-                MetaData temp = metaData.Find(t => t.name == item);
+                PluginMetaData temp = metaData.Find(t => t.name == item);
 
                 if (temp==null)
                 {
@@ -158,8 +159,8 @@ namespace gpm.Hanlder
         {
             EnsureInit();
 
-            MsgHelper.I($"Fetching metadata from {repo}");
-            var file = Path.GetFileName(repo);
+            MsgHelper.I($"Fetching metadata from {REPO_URL}");
+            //var file = Path.GetFileName(repo);
 
             // Asynchronous
             await AnsiConsole.Progress()
@@ -169,19 +170,19 @@ namespace gpm.Hanlder
                     var task1 = ctx.AddTask("[green]DownLoading[/]");
 
 
-                    await FileDownLoader.DownloadFileData(repo, Path.Combine(metadataDir, file), delegate (int a) {
+                    await FileDownLoader.DownloadFileData(REPO_URL, Path.Combine(metadataDir, PLUGIN_METADATA_FILE), delegate (int a) {
                         task1.Increment(a - task1.Percentage);
                     },Proxy);
 
                 });
 
-            MsgHelper.I($"Successfully updated metadata");
+            MsgHelper.I($"Successfully updated plugin metadata");
 
 
 
         }
 
-        public static async Task ListRepo(bool Proxy = false)
+        public static async Task ListRepo()
         {
 
 
@@ -189,17 +190,15 @@ namespace gpm.Hanlder
 
 
 
-
-            var file = Path.GetFileName(repo);
-
-            if (!File.Exists(Path.Combine(metadataDir, file)))
+            
+            if (!File.Exists(Path.Combine(metadataDir, PLUGIN_METADATA_FILE)))
             {
                 MsgHelper.E("No metadata found in disk, please run [bold]gpm update[/] first");
                 return;
             }
-            var raw_metaData = File.ReadAllText(Path.Combine(metadataDir, file));
+            var raw_metaData = File.ReadAllText(Path.Combine(metadataDir, PLUGIN_METADATA_FILE));
 
-            var metaData = JsonConvert.DeserializeObject<List<MetaData>>(raw_metaData);
+            var metaData = JsonConvert.DeserializeObject<List<PluginMetaData>>(raw_metaData);
 
             // Create a table
             var table = new Table();

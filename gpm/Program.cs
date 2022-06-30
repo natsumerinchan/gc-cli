@@ -43,8 +43,8 @@ namespace gpm
 
         enum InstallType
         {
-            Core,
-            Res,
+            core,
+            res,
         }
 
         static async Task<int> Main(string[] args)
@@ -54,13 +54,17 @@ namespace gpm
 
             var ProxyOption = new Option<bool>(
                 name: "-p",
-                description: "Enable Proxy in GPM.");
+                description: "Enable Proxy in GPM.",
+                getDefaultValue:()=>false
+                );
 
 
             var InstallOpthon = new Option<InstallType>(
-                name:"-t",
-                description:"安装资源类型"
-                );
+                name: "-t",
+                description: "安装资源类型",
+                getDefaultValue: () => InstallType.core
+
+                ) ;
 
 
 
@@ -92,13 +96,14 @@ namespace gpm
             addCommand.AddArgument(addArgument);
             removeCommand.AddArgument(removeArgument);
 
+            installCommand.AddOption(InstallOpthon);
 
 
             //proxy
             listrepoCommand.AddOption(ProxyOption);
             updateCommand.AddOption(ProxyOption);
             addCommand.AddOption(ProxyOption);
-
+            installCommand.AddOption(ProxyOption);
 
 
             initCommand.SetHandler(() => 
@@ -108,10 +113,23 @@ namespace gpm
 
             addCommand.SetHandler(async(pkgs,proxy)=> {await PluginHandler.Add(pkgs,proxy); }, addArgument,ProxyOption);
             removeCommand.SetHandler(async(pkgs)=> {await PluginHandler.Remove(pkgs); }, removeArgument);
-            updateCommand.SetHandler(async (proxy) => { await PluginHandler.Update(proxy); },ProxyOption);
+            updateCommand.SetHandler(async (proxy) => {
+                await PluginHandler.Update(proxy);
+                await CoreHandler.Update(proxy);
+                await ResHandler.Update(proxy);
+            },ProxyOption);
             listrepoCommand.SetHandler(async()=> {await PluginHandler.ListRepo(); });
             listCommand.SetHandler(async()=> {await PluginHandler.List(); });
-
+            installCommand.SetHandler((IType,proxy) =>
+            {
+                switch (IType)
+                {
+                    case InstallType.res:ResHandler.Install(proxy);break;
+                    case InstallType.core:CoreHandler.Install(proxy);break;
+                    default:
+                        break;
+                }
+            }, InstallOpthon,ProxyOption);
 
             rootCommand.AddCommand(initCommand);
             rootCommand.AddCommand(addCommand);
@@ -119,6 +137,7 @@ namespace gpm
             rootCommand.AddCommand(listrepoCommand);
             rootCommand.AddCommand(removeCommand);
             rootCommand.AddCommand(listCommand);
+            rootCommand.AddCommand(installCommand);
 
 
             return await rootCommand.InvokeAsync(args);

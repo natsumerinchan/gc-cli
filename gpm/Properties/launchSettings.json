@@ -2,8 +2,8 @@
   "profiles": {
     "gpm": {
       "commandName": "Project",
-      "commandLineArgs": "add -p mojoconsole-plus GCAuth GCAuth-OAuth",
-      "workingDirectory": "D:\\Server\\Server-2.7-dev\\Tester"
+      "commandLineArgs": "install -t res",
+      "workingDirectory": "D:\\Server\\Server-2.7-dev\\GPMTEST"
     }
   }
 }

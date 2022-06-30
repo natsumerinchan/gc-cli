@@ -7,6 +7,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static gpm.Program;
 
 namespace gpm.Common
 {
@@ -40,7 +41,16 @@ namespace gpm.Common
             {
                 wc.DownloadProgressChanged += wc_DownloadProgressChanged;
                 //wc.DownloadFileCompleted += wc_DownloadFileCompleted;
-                await wc.DownloadFileTaskAsync(new Uri(URL), filename);
+                try
+                {
+                    await wc.DownloadFileTaskAsync(new Uri(URL), filename);
+
+                }
+                catch (Exception e)
+                {
+                    MsgHelper.E(e.Message);
+                    throw;
+                }
             }
 
 
@@ -51,6 +61,41 @@ namespace gpm.Common
                 action(e.ProgressPercentage);
             }
 
+        }
+
+
+        public static void DownloadFileData(string URL, string filename,bool proxy)
+        {
+            if (proxy)
+            {
+                URL = PluginHandler.GetProxyString(URL);
+            }
+            else
+            {
+
+            }
+
+
+
+            if (!Directory.Exists(Path.GetDirectoryName(filename)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(filename));
+            }
+
+            using (WebClient wc = new WebClient())
+            {
+                try
+                {
+                    //await wc.DownloadFileTaskAsync(new Uri(URL), filename);
+                    wc.DownloadFile(new Uri(URL), filename);
+
+                }
+                catch (Exception e)
+                {
+                    MsgHelper.E(e.Message);
+                    throw;
+                }
+            }
         }
     }
 }
