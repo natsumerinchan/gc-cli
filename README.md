@@ -25,9 +25,9 @@ A package manager for grasscutter
   - [ ] 插件版本切换
   - [ ] 插件更新
   - [ ] 插件安装之后的后续使用提示
-- [ ] GC 资源相关
-    - [ ] 更新 GC 本体
-    - [ ] 更新 GC 的 Resource
+- [x] GC 资源相关
+    - [x] 更新 GC 本体
+    - [x] 更新 GC 的 Resource
 
 
 ## 命令帮助
@@ -44,12 +44,13 @@ Options:
   -?, -h, --help  Show help and usage information
 
 Commands:
-  init             设定GC的工作目录
+  init             已弃用
   add <要添加的包名>     添加插件
-  update           更新插件仓库信息
+  update           更新仓库信息
   listrepo         列出仓库中的插件
   remove <要删除的包名>  删除已安装的插件
   list             列出已安装的插件
+  install          在文件夹下安装GrassCutter
   ```
 
 ## 提醒
