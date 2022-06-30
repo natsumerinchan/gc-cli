@@ -41,6 +41,12 @@ namespace gpm
         }
 
 
+        enum InstallType
+        {
+            Core,
+            Res,
+        }
+
         static async Task<int> Main(string[] args)
         {
 
@@ -50,7 +56,15 @@ namespace gpm
                 name: "-p",
                 description: "Enable Proxy in GPM.");
 
-            var initCommand = new Command("init", "设定GC的工作目录")
+
+            var InstallOpthon = new Option<InstallType>(
+                name:"-t",
+                description:"安装资源类型"
+                );
+
+
+
+            var initCommand = new Command("init", "已弃用")
             {
 
             };
@@ -69,10 +83,16 @@ namespace gpm
             var listrepoCommand = new Command("listrepo", "列出仓库中的插件");
             var removeCommand = new Command("remove", "删除已安装的插件");
             var listCommand = new Command("list", "列出已安装的插件");
+            var installCommand = new Command("install", "在文件夹下安装GrassCutter");
+            var runCommand = new Command("run", "开启服务器");
+            var checkCommand = new Command("check", "检查运行环境");
+            var infoCommand = new Command("info", "列出所有信息");
 
 
             addCommand.AddArgument(addArgument);
             removeCommand.AddArgument(removeArgument);
+
+
 
             //proxy
             listrepoCommand.AddOption(ProxyOption);
@@ -86,9 +106,9 @@ namespace gpm
                 EnvHandler.Init();
             });
 
-            addCommand.SetHandler(async(pkgs)=> {await PluginHandler.Add(pkgs); }, addArgument);
+            addCommand.SetHandler(async(pkgs,proxy)=> {await PluginHandler.Add(pkgs,proxy); }, addArgument,ProxyOption);
             removeCommand.SetHandler(async(pkgs)=> {await PluginHandler.Remove(pkgs); }, removeArgument);
-            updateCommand.SetHandler(async () => { await PluginHandler.Update(); });
+            updateCommand.SetHandler(async (proxy) => { await PluginHandler.Update(proxy); },ProxyOption);
             listrepoCommand.SetHandler(async()=> {await PluginHandler.ListRepo(); });
             listCommand.SetHandler(async()=> {await PluginHandler.List(); });
 
