@@ -12,6 +12,8 @@ namespace gpm.DataTemplates
             /// 
             /// </summary>
             public string latest { get; set; }
+
+            public string all { get; set; }
         }
 
         public class Root

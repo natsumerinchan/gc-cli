@@ -10,6 +10,9 @@ using static gpm.PathMgr;
 using ICSharpCode.SharpZipLib.Zip;
 using gpm.DataTemplates;
 using Newtonsoft.Json;
+using Flurl;
+using Flurl.Http;
+using System.Linq;
 
 namespace gpm.Hanlder
 {
@@ -28,6 +31,11 @@ namespace gpm.Hanlder
 
             MsgHelper.I($"Fetching metadata from {repo}");
             //var file = Path.GetFileName(repo);
+
+            var path = await "http://files.foo.com/image.jpg"
+                .DownloadFileAsync("c:\\downloads", "a.");
+
+
 
             // Asynchronous
             await AnsiConsole.Progress()
@@ -109,7 +117,7 @@ namespace gpm.Hanlder
             s.Close();
         }
 
-        public static async Task Install(bool proxy = false)
+        public static async Task Install(string sha=null, bool proxy = false)
         {
 
             EnsureInit();
@@ -120,7 +128,41 @@ namespace gpm.Hanlder
             }
             var metadata = ReadMetaData();
 
-            var downLoadUrl = metadata.workflow.latest;
+            string downLoadUrl="";
+            if (String.IsNullOrEmpty(sha))
+            {
+                downLoadUrl = metadata.workflow.latest;
+
+
+            }
+            else
+            {
+                var wr = new WorkflowInfo.Root();
+                if (proxy)
+                {
+                    wr = await metadata.workflow.all
+                .GetJsonAsync<WorkflowInfo.Root>();
+                }
+                else
+                {
+                    wr = await PluginHandler. GetProxyString(metadata.workflow.all)
+                        .GetJsonAsync<WorkflowInfo.Root>();
+                }
+
+                var artifacts = wr.artifacts;
+                long runId = (from r in artifacts 
+                                where r.workflow_run.head_sha.StartsWith(sha) 
+                                select r.workflow_run.id).FirstOrDefault();
+
+                if (runId==null)
+                {
+                    MsgHelper.E($"找不到 sha 为 {sha} 的版本,请检查是否正确");
+                    return;
+                }
+                downLoadUrl = $"https://nightly.link/Grasscutters/Grasscutter/actions/artifacts/{runId}.zip";
+
+            }
+
             // Echo the fruit back to the terminal
 
 
@@ -129,20 +171,28 @@ namespace gpm.Hanlder
             //MsgHelper.I(Markup.Escape($"Installing Resource..."));
 
 
-            AnsiConsole.Status()
-                .Start("Downloading data...", ctx =>
+            await AnsiConsole.Status()
+                .Start("Downloading data...",async ctx =>
                 {
 
-                    FileDownLoader.DownloadFileData(downLoadUrl, Path.Combine(Environment.CurrentDirectory, filep), false);
+                    await FileDownLoader.DownloadFileData(
+                        URL: downLoadUrl, 
+                        filename: Path.Combine(Environment.CurrentDirectory, filep),
+                        action: (string s) =>
+                        {
+                            ctx.Status = s;
+                        },
+                        proxy: false);
 
                     ctx.Status = "UnPacking data...";
 
                     UnzipFile(Path.Combine(Environment.CurrentDirectory, filep), Environment.CurrentDirectory);
 
 
-                    MsgHelper.I($"Removing unused file...");
+                    ctx.Status=$"Removing unused file...";
 
                     File.Delete(Path.Combine(Environment.CurrentDirectory, filep));
+
                 });
 
 
