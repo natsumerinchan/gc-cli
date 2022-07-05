@@ -32,11 +32,6 @@ namespace gpm.Hanlder
             MsgHelper.I($"Fetching metadata from {repo}");
             //var file = Path.GetFileName(repo);
 
-            var path = await "http://files.foo.com/image.jpg"
-                .DownloadFileAsync("c:\\downloads", "a.");
-
-
-
             // Asynchronous
             await AnsiConsole.Progress()
                 .StartAsync(async ctx =>
@@ -45,7 +40,8 @@ namespace gpm.Hanlder
                     var task1 = ctx.AddTask("[green]DownLoading[/]");
 
 
-                    await FileDownLoader.DownloadFileData(repo, Path.Combine(metadataDir, CORE_METADATA_FILE), delegate (int a) {
+                    await FileDownLoader.DownloadFileData(repo, Path.Combine(metadataDir, CORE_METADATA_FILE), delegate (int a)
+                    {
                         task1.Increment(a - task1.Percentage);
                     }, Proxy);
 
@@ -71,7 +67,7 @@ namespace gpm.Hanlder
             try
             {
                 return JsonConvert
-                    .DeserializeObject< CoreMetaData.Root>
+                    .DeserializeObject<CoreMetaData.Root>
                     (File.ReadAllText(Path.Combine(metadataDir, CORE_METADATA_FILE)));
             }
             catch (Exception)
@@ -117,7 +113,7 @@ namespace gpm.Hanlder
             s.Close();
         }
 
-        public static async Task Install(string sha=null, bool proxy = false)
+        public static async Task Install(string sha = null, bool proxy = false)
         {
 
             EnsureInit();
@@ -128,7 +124,7 @@ namespace gpm.Hanlder
             }
             var metadata = ReadMetaData();
 
-            string downLoadUrl="";
+            string downLoadUrl = "";
             if (String.IsNullOrEmpty(sha))
             {
                 downLoadUrl = metadata.workflow.latest;
@@ -138,73 +134,74 @@ namespace gpm.Hanlder
             else
             {
                 var wr = new WorkflowInfo.Root();
-                if (!proxy)
-                {
-                    try
-                    {
 
-                        var wr1 = new Request().Get("https://www.baicu.com/");
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                }
-                else
+                try
                 {
-                //var res = await new Request().Get(metadata.workflow.all, null, proxy);
-                
+                    MsgHelper.I("Getting artifacts from actions...");
+
+                    var p = new Dictionary<string, string>();
+                    p.Add("per_page", "100");
+                    var a = await new Request().Get(metadata.workflow.all, p, proxy);
+                    wr = JsonConvert.DeserializeObject<WorkflowInfo.Root>(a);
+
+                    MsgHelper.I($"Found {wr.artifacts.Count} from actions...");
+
                 }
+                catch (Exception ex)
+                {
+                    MsgHelper.E(ex.Message);
+                    Environment.Exit(0);
+                }
+
 
                 var artifacts = wr.artifacts;
-                long runId = (from r in artifacts 
-                                where r.workflow_run.head_sha.StartsWith(sha) 
-                                select r.workflow_run.id).FirstOrDefault();
+                long[] runId = (from r in artifacts
+                                where r.workflow_run.head_sha.StartsWith(sha)
+                                select r.id).ToArray();
 
-                if (runId==null)
+                if (runId.Count() == 0)
                 {
-                    MsgHelper.E($"找不到 sha 为 {sha} 的版本,请检查是否正确");
+                    MsgHelper.E($"找不到 sha 为 {sha} 版本的GrassCutter.");
                     return;
                 }
-                downLoadUrl = $"https://nightly.link/Grasscutters/Grasscutter/actions/artifacts/{runId}.zip";
+                downLoadUrl = $"https://nightly.link/Grasscutters/Grasscutter/actions/artifacts/{runId[0]}.zip";
+
+
+
+
+
+                var filep = Path.GetFileName(downLoadUrl);
+
+
+
+                await AnsiConsole.Status()
+                    .Start("Downloading data...", async ctx =>
+                     {
+
+                        await FileDownLoader.DownloadFileData(
+                            URL: downLoadUrl,
+                            filename: Path.Combine(Environment.CurrentDirectory, filep),
+                            action: (string s) =>
+                            {
+                                ctx.Status = s;
+                            },
+                            proxy: false);
+
+                        ctx.Status = "UnPacking data...";
+
+                        UnzipFile(Path.Combine(Environment.CurrentDirectory, filep), Environment.CurrentDirectory);
+
+
+                        ctx.Status = $"Removing unused file...";
+
+                        File.Delete(Path.Combine(Environment.CurrentDirectory, filep));
+
+                    });
+
+
+                MsgHelper.I($"Successfully installed Core");
 
             }
-
-            // Echo the fruit back to the terminal
-
-
-            var filep = Path.GetFileName(downLoadUrl);
-
-            //MsgHelper.I(Markup.Escape($"Installing Resource..."));
-
-
-            await AnsiConsole.Status()
-                .Start("Downloading data...",async ctx =>
-                {
-
-                    await FileDownLoader.DownloadFileData(
-                        URL: downLoadUrl, 
-                        filename: Path.Combine(Environment.CurrentDirectory, filep),
-                        action: (string s) =>
-                        {
-                            ctx.Status = s;
-                        },
-                        proxy: false);
-
-                    ctx.Status = "UnPacking data...";
-
-                    UnzipFile(Path.Combine(Environment.CurrentDirectory, filep), Environment.CurrentDirectory);
-
-
-                    ctx.Status=$"Removing unused file...";
-
-                    File.Delete(Path.Combine(Environment.CurrentDirectory, filep));
-
-                });
-
-
-            MsgHelper.I($"Successfully installed Core");
-
         }
     }
 }
