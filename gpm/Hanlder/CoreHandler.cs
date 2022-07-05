@@ -138,15 +138,22 @@ namespace gpm.Hanlder
             else
             {
                 var wr = new WorkflowInfo.Root();
-                if (proxy)
+                if (!proxy)
                 {
-                    wr = await metadata.workflow.all
-                .GetJsonAsync<WorkflowInfo.Root>();
+                    try
+                    {
+
+                        var wr1 = new Request().Get("https://www.baicu.com/");
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
                 else
                 {
-                    wr = await PluginHandler. GetProxyString(metadata.workflow.all)
-                        .GetJsonAsync<WorkflowInfo.Root>();
+                //var res = await new Request().Get(metadata.workflow.all, null, proxy);
+                
                 }
 
                 var artifacts = wr.artifacts;

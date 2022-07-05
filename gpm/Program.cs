@@ -67,7 +67,7 @@ namespace gpm
                 ) ;
 
             var verOption = new Option<string>(
-                name: "v",
+                name: "-v",
                 description: "指定安装的版本"
                 );
 
@@ -107,6 +107,7 @@ namespace gpm
             updateCommand.AddOption(ProxyOption);
             addCommand.AddOption(ProxyOption);
             installCommand.AddOption(ProxyOption);
+            installCommand.AddOption(verOption);
 
 
             initCommand.SetHandler(() => 

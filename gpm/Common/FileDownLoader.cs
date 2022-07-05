@@ -73,8 +73,8 @@ namespace gpm.Common
         }
 
 
-        public async static Task DownloadFileData(string URL, string filename, Action<string>action,bool proxy)
-        { 
+        public async static Task DownloadFileData(string URL, string filename,Action<string>action, bool proxy)
+        {
             if (proxy)
             {
                 URL = PluginHandler.GetProxyString(URL);
@@ -83,53 +83,27 @@ namespace gpm.Common
             {
 
             }
+
+
+
             if (!Directory.Exists(Path.GetDirectoryName(filename)))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(filename));
             }
 
-            var progressMessageHandler = new ProgressMessageHandler(new HttpClientHandler());
-
-            progressMessageHandler.HttpReceiveProgress += (j, m) =>
+            using (WebClient wc = new WebClient())
             {
-                var p = m.BytesTransferred;
-
-                string s = $"已下载 {p / 1024 / 10224} MB";
-
-                action.Invoke(s);
-            };
-
-
-            using (HttpClient client = new HttpClient(progressMessageHandler))
-            {
-
-                using (var filestream = new FileStream(filename, FileMode.Create))
+                try
                 {
+                    //await wc.DownloadFileTaskAsync(new Uri(URL), filename);
+                    wc.DownloadFile(new Uri(URL), filename);
 
-                    try
-                    {
-                        var netstream = await client.GetStreamAsync(URL);
-
-                        await netstream.CopyToAsync(filestream);
-
-                    }
-                    catch (Exception ex)
-                    {
-
-                        throw;
-                    }
                 }
-                ////wc.DownloadFileCompleted += wc_DownloadFileCompleted;
-                //try
-                //{
-                //    await wc.DownloadFileTaskAsync(new Uri(URL), filename);
-
-                //}
-                //catch (Exception e)
-                //{
-                //    MsgHelper.E(e.Message);
-                //    throw;
-                //}
+                catch (Exception e)
+                {
+                    MsgHelper.E(e.Message);
+                    throw;
+                }
             }
         }
     }
