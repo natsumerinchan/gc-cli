@@ -167,7 +167,7 @@ namespace gpm.Hanlder
                 downLoadUrl = $"https://nightly.link/Grasscutters/Grasscutter/actions/artifacts/{runId[0]}.zip";
 
 
-
+            }
 
 
                 var filep = Path.GetFileName(downLoadUrl);
@@ -201,7 +201,7 @@ namespace gpm.Hanlder
 
                 MsgHelper.I($"Successfully installed Core");
 
-            }
+            
         }
     }
 }

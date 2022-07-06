@@ -2,7 +2,7 @@
   "profiles": {
     "gpm": {
       "commandName": "Project",
-      "commandLineArgs": "install -v 1.2.2-dev-0e39dd9",
+      "commandLineArgs": "install",
       "workingDirectory": "D:\\Server\\Server-2.7-dev\\GPMTEST",
       "nativeDebugging": true
     }
