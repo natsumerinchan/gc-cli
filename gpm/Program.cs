@@ -54,7 +54,7 @@ namespace gpm
 
             var ProxyOption = new Option<bool>(
                 name: "-p",
-                description: "Enable Proxy in GPM.",
+                description: "启用请求代理.",
                 getDefaultValue:()=>false
                 );
 
@@ -66,7 +66,10 @@ namespace gpm
 
                 ) ;
 
-
+            var verOption = new Option<string>(
+                name: "-v",
+                description: "指定安装的版本"
+                );
 
             var initCommand = new Command("init", "已弃用")
             {
@@ -104,6 +107,7 @@ namespace gpm
             updateCommand.AddOption(ProxyOption);
             addCommand.AddOption(ProxyOption);
             installCommand.AddOption(ProxyOption);
+            installCommand.AddOption(verOption);
 
 
             initCommand.SetHandler(() => 
@@ -120,16 +124,21 @@ namespace gpm
             },ProxyOption);
             listrepoCommand.SetHandler(async()=> {await PluginHandler.ListRepo(); });
             listCommand.SetHandler(async()=> {await PluginHandler.List(); });
-            installCommand.SetHandler((IType,proxy) =>
+            installCommand.SetHandler((IType,ver,proxy) =>
             {
-                switch (IType)
-                {
-                    case InstallType.res:ResHandler.Install(proxy);break;
-                    case InstallType.core:CoreHandler.Install(proxy);break;
-                    default:
-                        break;
-                }
-            }, InstallOpthon,ProxyOption);
+                    string sha = new Common.CoreVersionHelper.VersionInfo(ver).GetSha();
+
+                    switch (IType)
+                    {
+                        case InstallType.res: ResHandler.Install(proxy); break;
+                        case InstallType.core: CoreHandler.Install(sha, proxy); break;
+                        default:
+                            break;
+                    }
+                
+
+                
+            }, InstallOpthon,verOption,ProxyOption);
 
             rootCommand.AddCommand(initCommand);
             rootCommand.AddCommand(addCommand);

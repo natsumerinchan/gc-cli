@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Handlers;
 using System.Text;
 using System.Threading.Tasks;
 using static gpm.Program;
@@ -31,40 +33,47 @@ namespace gpm.Common
             }
 
 
-
             if(!Directory.Exists(Path.GetDirectoryName(filename)))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(filename));
             }
 
-            using (WebClient wc = new WebClient())
-            {
-                wc.DownloadProgressChanged += wc_DownloadProgressChanged;
-                //wc.DownloadFileCompleted += wc_DownloadFileCompleted;
-                try
-                {
-                    await wc.DownloadFileTaskAsync(new Uri(URL), filename);
+            var progressMessageHandler = new ProgressMessageHandler(new HttpClientHandler());
 
-                }
-                catch (Exception e)
+            progressMessageHandler.HttpReceiveProgress += (j, m) =>
+            {
+                var p = m.ProgressPercentage;
+
+                action.Invoke(p);
+            };
+
+
+            using (HttpClient client = new HttpClient(progressMessageHandler))
+            {
+
+                using (var filestream = new FileStream(filename, FileMode.Create))
                 {
-                    MsgHelper.E(e.Message);
-                    throw;
+                    var netstream = await client.GetStreamAsync(URL);
+                    await netstream.CopyToAsync(filestream);
                 }
+                ////wc.DownloadFileCompleted += wc_DownloadFileCompleted;
+                //try
+                //{
+                //    await wc.DownloadFileTaskAsync(new Uri(URL), filename);
+
+                //}
+                //catch (Exception e)
+                //{
+                //    MsgHelper.E(e.Message);
+                //    throw;
+                //}
             }
 
-
-             void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-            {
-                // In case you don't have a progressBar Log the value instead 
-                // Console.WriteLine(e.ProgressPercentage);
-                action(e.ProgressPercentage);
-            }
 
         }
 
 
-        public static void DownloadFileData(string URL, string filename,bool proxy)
+        public async static Task DownloadFileData(string URL, string filename,Action<string>action, bool proxy)
         {
             if (proxy)
             {

@@ -10,6 +10,9 @@ using static gpm.PathMgr;
 using ICSharpCode.SharpZipLib.Zip;
 using gpm.DataTemplates;
 using Newtonsoft.Json;
+using Flurl;
+using Flurl.Http;
+using System.Linq;
 
 namespace gpm.Hanlder
 {
@@ -37,7 +40,8 @@ namespace gpm.Hanlder
                     var task1 = ctx.AddTask("[green]DownLoading[/]");
 
 
-                    await FileDownLoader.DownloadFileData(repo, Path.Combine(metadataDir, CORE_METADATA_FILE), delegate (int a) {
+                    await FileDownLoader.DownloadFileData(repo, Path.Combine(metadataDir, CORE_METADATA_FILE), delegate (int a)
+                    {
                         task1.Increment(a - task1.Percentage);
                     }, Proxy);
 
@@ -63,7 +67,7 @@ namespace gpm.Hanlder
             try
             {
                 return JsonConvert
-                    .DeserializeObject< CoreMetaData.Root>
+                    .DeserializeObject<CoreMetaData.Root>
                     (File.ReadAllText(Path.Combine(metadataDir, CORE_METADATA_FILE)));
             }
             catch (Exception)
@@ -109,7 +113,7 @@ namespace gpm.Hanlder
             s.Close();
         }
 
-        public static async Task Install(bool proxy = false)
+        public static async Task Install(string sha = null, bool proxy = false)
         {
 
             EnsureInit();
@@ -120,34 +124,84 @@ namespace gpm.Hanlder
             }
             var metadata = ReadMetaData();
 
-            var downLoadUrl = metadata.workflow.latest;
-            // Echo the fruit back to the terminal
+            string downLoadUrl = "";
+            if (String.IsNullOrEmpty(sha))
+            {
+                downLoadUrl = metadata.workflow.latest;
 
 
-            var filep = Path.GetFileName(downLoadUrl);
+            }
+            else
+            {
+                var wr = new WorkflowInfo.Root();
 
-            //MsgHelper.I(Markup.Escape($"Installing Resource..."));
-
-
-            AnsiConsole.Status()
-                .Start("Downloading data...", ctx =>
+                try
                 {
+                    MsgHelper.I("Getting artifacts from actions...");
 
-                    FileDownLoader.DownloadFileData(downLoadUrl, Path.Combine(Environment.CurrentDirectory, filep), false);
+                    var p = new Dictionary<string, string>();
+                    p.Add("per_page", "100");
+                    var a = await new Request().Get(metadata.workflow.all, p, proxy);
+                    wr = JsonConvert.DeserializeObject<WorkflowInfo.Root>(a);
 
-                    ctx.Status = "UnPacking data...";
+                    MsgHelper.I($"Found {wr.artifacts.Count} from actions...");
 
-                    UnzipFile(Path.Combine(Environment.CurrentDirectory, filep), Environment.CurrentDirectory);
+                }
+                catch (Exception ex)
+                {
+                    MsgHelper.E(ex.Message);
+                    Environment.Exit(0);
+                }
 
 
-                    MsgHelper.I($"Removing unused file...");
+                var artifacts = wr.artifacts;
+                long[] runId = (from r in artifacts
+                                where r.workflow_run.head_sha.StartsWith(sha)
+                                select r.id).ToArray();
 
-                    File.Delete(Path.Combine(Environment.CurrentDirectory, filep));
-                });
+                if (runId.Count() == 0)
+                {
+                    MsgHelper.E($"找不到 sha 为 {sha} 版本的GrassCutter.");
+                    return;
+                }
+                downLoadUrl = $"https://nightly.link/Grasscutters/Grasscutter/actions/artifacts/{runId[0]}.zip";
 
 
-            MsgHelper.I($"Successfully installed Core");
+            }
 
+
+                var filep = Path.GetFileName(downLoadUrl);
+
+
+
+                await AnsiConsole.Status()
+                    .Start("Downloading data...", async ctx =>
+                     {
+
+                        await FileDownLoader.DownloadFileData(
+                            URL: downLoadUrl,
+                            filename: Path.Combine(Environment.CurrentDirectory, filep),
+                            action: (string s) =>
+                            {
+                                ctx.Status = s;
+                            },
+                            proxy: false);
+
+                        ctx.Status = "UnPacking data...";
+
+                        UnzipFile(Path.Combine(Environment.CurrentDirectory, filep), Environment.CurrentDirectory);
+
+
+                        ctx.Status = $"Removing unused file...";
+
+                        File.Delete(Path.Combine(Environment.CurrentDirectory, filep));
+
+                    });
+
+
+                MsgHelper.I($"Successfully installed Core");
+
+            
         }
     }
 }

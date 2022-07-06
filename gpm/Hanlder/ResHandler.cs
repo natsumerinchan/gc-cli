@@ -157,10 +157,17 @@ namespace gpm.Hanlder
             var filep = Path.GetFileName(downLoadUrl);
 
 
-            AnsiConsole.Status()
-                .Start("Downloading file...", ctx =>
+            await AnsiConsole.Status()
+                .Start("Downloading file...",async ctx =>
                 {
-                    FileDownLoader.DownloadFileData(downLoadUrl, Path.Combine(resourceDir, filep), false);
+                    await FileDownLoader.DownloadFileData(
+                        URL: downLoadUrl,
+                        filename: Path.Combine(Environment.CurrentDirectory, filep),
+                        action: (string s) =>
+                        {
+                            ctx.Status = s;
+                        },
+                        proxy: false);
 
                     ctx.Status = "Unpacking data...";
                     UnzipFile(Path.Combine(resourceDir, filep), resourceDir);
@@ -175,12 +182,14 @@ namespace gpm.Hanlder
 
                     File.Delete(Path.Combine(resourceDir, filep));
 
-                    //DirectoryInfo di = new DirectoryInfo(Path.Combine(resourceDir, filep));
-                    //di.Delete();
+                    DirectoryInfo di = new DirectoryInfo(
+                        Path.Combine(resourceDir, originPath.Split("/").FirstOrDefault())
+                        );
+                    di.Delete();
 
                 });
 
-            MsgHelper.I($"Successfully installed Resources ");
+            MsgHelper.I($"Successfully installed Resources");
 
         }
 

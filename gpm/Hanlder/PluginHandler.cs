@@ -10,6 +10,9 @@ using gpm.Common;
 using System.IO;
 using Newtonsoft.Json;
 using gpm.DataTemplates;
+using Flurl;
+using Flurl.Http;
+
 namespace gpm.Hanlder
 {
     
@@ -60,7 +63,6 @@ namespace gpm.Hanlder
             var raw_metaData = File.ReadAllText(Path.Combine(metadataDir, PLUGIN_METADATA_FILE));
 
             var metaData = JsonConvert.DeserializeObject<List<PluginMetaData> >(raw_metaData);
-            var request = new Request();
             var index = 0;
             foreach (var item in pkgs)
             {
@@ -76,8 +78,9 @@ namespace gpm.Hanlder
                 MsgHelper.I($"Getting plugin realeaseinfo");
 
                 //不需要代理
-                var response = await request.Get($"{GITHUB_API}/repos/{temp.github}/{temp.releases}",null,false);
-                var pluginInfo = JsonConvert.DeserializeObject<RealeaseInfo.Root>(response);
+                var pluginInfo = await GITHUB_API
+                    .AppendPathSegment($"/repos/{temp.github}/{temp.releases}")
+                    .GetJsonAsync<RealeaseInfo.Root>();
 
                 var downLoadUrl = pluginInfo.assets[0].browser_download_url;
                 var filep = Path.GetFileName(downLoadUrl);
@@ -85,7 +88,6 @@ namespace gpm.Hanlder
                 MsgHelper.I(Markup.Escape($"[{index}/{pkgs.Count}] Installing {item} {pluginInfo.tag_name}"));
 
 
-                //MsgHelper.I($"Updatelog \n{new Panel( Markup.Escape( pluginInfo.body))}");
 
                 var rule = new Rule("[green]更新日志[/]");
 
@@ -99,8 +101,7 @@ namespace gpm.Hanlder
                 await AnsiConsole.Progress()
                     .StartAsync(async ctx =>
                     {
-                    // Define tasks
-                    var task1 = ctx.AddTask("[green]DownLoading[/]");
+                        var task1 = ctx.AddTask("[green]DownLoading[/]");
 
 
                         await FileDownLoader.DownloadFileData(downLoadUrl, Path.Combine(pluginDir, filep), delegate (int a) {
