@@ -4,10 +4,8 @@ using gpm.DataTemplates;
 using Newtonsoft.Json;
 using Spectre.Console;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static gc_cli.ConstProps.Paths;
 namespace gc_cli.Handlers
@@ -112,8 +110,8 @@ namespace gc_cli.Handlers
                         }
                         else
                         {
-                        
-                            wr= await $"{metadata.workflow.all}?per_page=100".GetJsonAsync<WorkflowInfo.Root>();
+
+                            wr = await $"{metadata.workflow.all}?per_page=100".GetJsonAsync<WorkflowInfo.Root>();
 
 
                         }
@@ -125,7 +123,7 @@ namespace gc_cli.Handlers
                     }
 
 
-                MsgHelper.I($"在 actions 中找到了 {wr.artifacts.Count} 条信息");
+                    MsgHelper.I($"在 actions 中找到了 {wr.artifacts.Count} 条信息");
 
                 }
                 catch (Exception ex)
@@ -156,7 +154,7 @@ namespace gc_cli.Handlers
 
             AnsiConsole.Markup("[[1/3]]下载文件...\n");
 
-            new DownLoader().DownLoadWithProgressBar(downLoadUrl,zipfile);
+            new DownLoader().DownLoadWithProgressBar(downLoadUrl, zipfile);
 
             AnsiConsole.Markup("[[2/3]]解压文件...\n");
 

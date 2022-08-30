@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static gc_cli.ConstProps.Paths;
 
@@ -74,7 +73,7 @@ namespace gc_cli.Handlers
 
         }
 
-        public static async Task Install(string ver,bool proxy = false)
+        public static async Task Install(string ver, bool proxy = false)
         {
 
             EnsureInit();
@@ -116,7 +115,7 @@ namespace gc_cli.Handlers
                 selMetadata = (metadata.Where(r => r.name == selrepo)).FirstOrDefault();
 
 
-                if (selMetadata==null)
+                if (selMetadata == null)
                 {
                     MsgHelper.E($"未找到名称为 {ver} 的资源，请检查拼写后重试！");
                     return;
@@ -126,13 +125,13 @@ namespace gc_cli.Handlers
             {
                 selMetadata = metadata.FirstOrDefault();
             }
-            
+
 
             var downLoadUrl = selMetadata.archive.url;
 
-            if (selMetadata.type=="anonfiles")
+            if (selMetadata.type == "anonfiles")
             {
-                downLoadUrl =await Common.AnonfileTools.GetDownloadUrl(downLoadUrl);
+                downLoadUrl = await Common.AnonfileTools.GetDownloadUrl(downLoadUrl);
             }
             if (proxy)
             {

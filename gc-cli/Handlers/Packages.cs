@@ -6,7 +6,6 @@ using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using static gc_cli.ConstProps.Paths;
 
@@ -27,7 +26,7 @@ namespace gc_cli.Handlers
 
         }
 
-        private static List< DataTemplates.PackageMetaData.Root > ReadMetaData()
+        private static List<DataTemplates.PackageMetaData.Root> ReadMetaData()
         {
             List<DataTemplates.PackageMetaData.Root> ret = new List<DataTemplates.PackageMetaData.Root>();
 
@@ -138,11 +137,11 @@ namespace gc_cli.Handlers
 
                 var downLoadUrl = temp.file;
 
-                
-                if (temp.type=="anonfiles")
+
+                if (temp.type == "anonfiles")
                 {
                     MsgHelper.W($"类型为{temp.type}的文件不支持内置代理下载，将忽略-p选项!");
-                    downLoadUrl =await Common.AnonfileTools.GetDownloadUrl(downLoadUrl);
+                    downLoadUrl = await Common.AnonfileTools.GetDownloadUrl(downLoadUrl);
                 }
                 else
                 {
@@ -151,8 +150,8 @@ namespace gc_cli.Handlers
                         downLoadUrl = ProxyHelper.GetRawProxy(downLoadUrl);
                     }
                 }
-                
-                
+
+
 
                 AnsiConsole.Markup(Markup.Escape($"[{index}/{pkgs.Count}] 正在准备安装 {temp.name}\n"));
 
@@ -167,7 +166,7 @@ namespace gc_cli.Handlers
                 var table = new Table();
                 table.Border = TableBorder.None;
                 table.AddColumn(new TableColumn("[blue]文件列表:[/]"));
-                table.AddRow(Markup.Escape(String.Join("\n" ,temp.uninstall.ToArray())));
+                table.AddRow(Markup.Escape(String.Join("\n", temp.uninstall.ToArray())));
                 AnsiConsole.Write(table);
 
                 var filep = Path.GetFileName(downLoadUrl);
@@ -180,7 +179,7 @@ namespace gc_cli.Handlers
 
                 AnsiConsole.Markup("[[2/3]]解压文件...\n");
 
-                Unziper.UnzipFile(zipfile, Path.Combine(Environment.CurrentDirectory,temp.installationPath));
+                Unziper.UnzipFile(zipfile, Path.Combine(Environment.CurrentDirectory, temp.installationPath));
 
                 AnsiConsole.Markup($"[[3/3]]清理文件...\n");
 

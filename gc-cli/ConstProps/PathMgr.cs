@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace gc_cli.ConstProps
 {
@@ -13,20 +11,20 @@ namespace gc_cli.ConstProps
 
         public static string PLUGIN_DIR = Path.Combine(Environment.CurrentDirectory, "plugins");
 
-        public static string RESOURCE_DIR= Path.Combine(Environment.CurrentDirectory, "resources");
+        public static string RESOURCE_DIR = Path.Combine(Environment.CurrentDirectory, "resources");
 
         public static string METADATA_DIR = Path.Combine(DATA_DIR, "metadata");
 
         public static string DOWNLOAD_CACHE_DIR = Path.Combine(DATA_DIR, "cache");
 
 
-        public const string PLUGIN_METADATA_FILE= "plugin.json";
+        public const string PLUGIN_METADATA_FILE = "plugin.json";
 
-        public const string CORE_METADATA_FILE= "core.json";
+        public const string CORE_METADATA_FILE = "core.json";
 
-        public const string PACKAGE_METADATA_FILE= "package.json";
+        public const string PACKAGE_METADATA_FILE = "package.json";
 
-        public const string RESOURCE_METADATA_FILE= "resource.json";
+        public const string RESOURCE_METADATA_FILE = "resource.json";
 
 
 

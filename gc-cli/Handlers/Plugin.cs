@@ -8,8 +8,6 @@ using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static gc_cli.ConstProps.Paths;
 
@@ -138,7 +136,7 @@ namespace gc_cli.Handlers
 
 
                 new DownLoader().DownLoadWithProgressBar(downLoadUrl, Path.Combine(PLUGIN_DIR, filep));
-                
+
 
 
                 MsgHelper.I($"成功安装了插件 {item}");
@@ -220,7 +218,7 @@ namespace gc_cli.Handlers
         {
             EnsureInit();
 
-            if (pkgs.Count==0)
+            if (pkgs.Count == 0)
             {
                 Environment.Exit(0);
             }

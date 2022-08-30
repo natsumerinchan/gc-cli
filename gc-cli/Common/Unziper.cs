@@ -1,11 +1,7 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using Spectre.Console;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gc_cli.Common
 {
@@ -17,7 +13,7 @@ namespace gc_cli.Common
         /// <param name="file">文件位置</param>
         /// <param name="folder">目标位置</param>
         /// <param name="remove">解压完成是否删除</param>
-        public static void UnzipFile(string file, string folder,bool remove=false)
+        public static void UnzipFile(string file, string folder, bool remove = false)
         {
             MsgHelper.I($"正在把 {file} 解压到 {folder}文件夹内");
             AnsiConsole.Status()

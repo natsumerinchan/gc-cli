@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace gpm.DataTemplates
+﻿namespace gpm.DataTemplates
 {
     class ResMetaData
     {
@@ -13,7 +9,7 @@ namespace gpm.DataTemplates
             /// </summary>
             public string target { get; set; }
         }
-  
+
         public class Archive
         {
             /// <summary>
@@ -36,16 +32,16 @@ namespace gpm.DataTemplates
             /// 
             /// </summary>
             public Archive archive { get; set; }
-            
+
             /// <summary>
             /// 
             /// </summary>
             public string type { get; set; }
-            
+
             /// <summary>
             /// 
             /// </summary>
-            public string name { get; set; }    
+            public string name { get; set; }
         }
 
     }

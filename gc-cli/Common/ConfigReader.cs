@@ -1,26 +1,23 @@
-﻿using gc_cli.Common;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Spectre.Console;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 
 namespace gc_cli.Common
 {
     internal class ConfigReader
     {
-        private static string GetArrayStr(string [] s)
+        private static string GetArrayStr(string[] s)
         {
-            var ret=  String.Concat(s);
+            var ret = String.Concat(s);
             return ret;
         }
 
         public static DataTemplates.ServerConfig.Root Read()
         {
             var cfgObj = new DataTemplates.ServerConfig.Root();
-            string cfg=string.Empty;
+            string cfg = string.Empty;
             if (!File.Exists(ConstProps.Paths.GC_CFG_FILEPATH))
             {
                 MsgHelper.W("未找到服务器的配置文件.");
@@ -28,10 +25,10 @@ namespace gc_cli.Common
             }
             else
             {
-                cfg=File.ReadAllText(ConstProps.Paths.GC_CFG_FILEPATH);
+                cfg = File.ReadAllText(ConstProps.Paths.GC_CFG_FILEPATH);
                 try
                 {
-                    cfgObj= JsonConvert.DeserializeObject<DataTemplates.ServerConfig.Root>(cfg);
+                    cfgObj = JsonConvert.DeserializeObject<DataTemplates.ServerConfig.Root>(cfg);
                 }
                 catch (Exception ex)
                 {
@@ -45,9 +42,9 @@ namespace gc_cli.Common
 
         public static void RenderCfg()
         {
-            var cfg=Read();
+            var cfg = Read();
 
-            if (cfg!=null)
+            if (cfg != null)
             {
                 Table tb = new Table();
 
@@ -59,11 +56,11 @@ namespace gc_cli.Common
                     $"运行模式:{cfg.server.runMode}    " +
                     $"调试等级:{cfg.server.debugLevel}";
 
-                var pn2 = $"游戏服务器:{cfg.server.game.bindAddress}:{cfg.server.game.bindPort}    \n" +
+                var pn2 = $"游戏服务器:{cfg.server.game.accessAddress}:{cfg.server.game.bindPort}    \n" +
                     $"数据库:{cfg.databaseInfo.game.connectionUri}";
 
                 var pn3 = $"Http服务器:" +
-                    $"{cfg.server.http.bindAddress}:{cfg.server.http.bindPort}    \n" +
+                    $"{cfg.server.http.accessAddress}:{cfg.server.http.bindPort}    \n" +
                     $"CORS:{cfg.server.http.policies.cors.enabled}    " +
                     $"Allowed Origins:{GetArrayStr(cfg.server.http.policies.cors.allowedOrigins.ToArray())}";
                 var pn4 = $"自动创建账户:{cfg.account.autoCreate}    \n" +
@@ -79,7 +76,7 @@ namespace gc_cli.Common
 
                 AnsiConsole.Write(tb);
 
-                
+
 
             }
         }

@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gc_cli.Handlers
 {
@@ -18,7 +16,7 @@ namespace gc_cli.Handlers
             DirectoryInfo directoryInfo = new DirectoryInfo(Environment.CurrentDirectory);
             var files = directoryInfo.GetFiles();
 
-            List<string> jarfiles = new List<string>() ;
+            List<string> jarfiles = new List<string>();
 
             foreach (var item in files)
             {
@@ -28,12 +26,13 @@ namespace gc_cli.Handlers
 
                 }
             }
-            string targetFile=null;
+            string targetFile = null;
 
-            if (jarfiles.Count==0)
+            if (jarfiles.Count == 0)
             {
                 MsgHelper.E("请至少安装一个核心文件!");
-            }else if (jarfiles.Count == 1)
+            }
+            else if (jarfiles.Count == 1)
             {
                 targetFile = jarfiles.First();
             }
@@ -50,7 +49,7 @@ namespace gc_cli.Handlers
             }
 
 
-            if (targetFile==null)
+            if (targetFile == null)
             {
                 return;
             }

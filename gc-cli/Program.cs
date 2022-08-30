@@ -1,6 +1,5 @@
 ﻿using gc_cli.Common;
 using Spectre.Console;
-using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.Threading.Tasks;
@@ -25,10 +24,13 @@ namespace gc_cli
         }
         static async Task<int> Main(string[] args)
         {
-            //AnsiConsole.Write(
-            //    new FigletText("GC-CLI")
-            //        .LeftAligned()
-            //        .Color(Color.Blue));
+            if (args.Length == 0)
+            {
+                AnsiConsole.Write(
+                    new FigletText("GC-CLI")
+                        .LeftAligned()
+                        .Color(Color.Blue));
+            }
 
 
 
@@ -88,10 +90,11 @@ namespace gc_cli
             //new DownLoader().DownLoadWithProgressBar(url, filepath);
 
 
-            
+
             updateCommand.AddOption(ProxyOption);
 
-            updateCommand.SetHandler(async (proxy) => {
+            updateCommand.SetHandler(async (proxy) =>
+            {
                 await Handlers.Core.Update(proxy);
                 await Handlers.Plugin.Update(proxy);
                 await Handlers.Resources.Update(proxy);
@@ -102,21 +105,25 @@ namespace gc_cli
             installCommand.AddOption(InstallOpthon);
             installCommand.AddOption(ProxyOption);
             installCommand.AddOption(verOption);
-            installCommand.SetHandler(async(IType, ver, proxy) =>
+            installCommand.SetHandler(async (IType, ver, proxy) =>
             {
 
                 switch (IType)
                 {
-                    case InstallType.res: {
+                    case InstallType.res:
+                        {
 
 
-                            await Handlers.Resources.Install(ver,proxy);
+                            await Handlers.Resources.Install(ver, proxy);
 
-                            } break;
-                    case InstallType.core: {
+                        }
+                        break;
+                    case InstallType.core:
+                        {
                             string sha = new Common.CoreVersionHelper.VersionInfo(ver).GetSha();
-                            await Handlers.Core.Install(sha, proxy); 
-                        } break;
+                            await Handlers.Core.Install(sha, proxy);
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -126,10 +133,10 @@ namespace gc_cli
             }, InstallOpthon, verOption, ProxyOption);
 
 
-            listpkgiCommand.SetHandler(async () => 
+            listpkgiCommand.SetHandler(async () =>
             {
-                    //case FileType.plu: await Handlers.Plugin.ListRepo(); break;
-                    await Handlers.Packages.ListRepo(); 
+                //case FileType.plu: await Handlers.Plugin.ListRepo(); break;
+                await Handlers.Packages.ListRepo();
 
             });
             listpluiCommand.SetHandler(async () =>
@@ -143,11 +150,11 @@ namespace gc_cli
 
             addpkgCommand.AddArgument(addArgument);
             addpkgCommand.AddOption(ProxyOption);
-            addpkgCommand.SetHandler(async (pkgs, proxy) => 
+            addpkgCommand.SetHandler(async (pkgs, proxy) =>
             {
-                 //await Handlers.Plugin.Add(pkgs,proxy); 
-                 await Handlers.Packages.Add(pkgs,proxy); 
-                 
+                //await Handlers.Plugin.Add(pkgs,proxy); 
+                await Handlers.Packages.Add(pkgs, proxy);
+
             }, addArgument, ProxyOption);
             addpluCommand.AddArgument(addArgument);
             addpluCommand.AddOption(ProxyOption);
@@ -159,12 +166,12 @@ namespace gc_cli
             }, addArgument, ProxyOption);
 
             rmpluCommand.AddArgument(removeArgument);
-            rmpluCommand.SetHandler(async (pkgs) => 
+            rmpluCommand.SetHandler(async (pkgs) =>
             {
-                    await Handlers.Plugin.Remove(pkgs);
-                    //await Handlers.Packages.Remove(pkgs);
-                    
-                
+                await Handlers.Plugin.Remove(pkgs);
+                //await Handlers.Packages.Remove(pkgs);
+
+
             }, removeArgument);
             rmpkgCommand.AddArgument(removeArgument);
             rmpkgCommand.SetHandler(async (pkgs) =>
@@ -175,7 +182,7 @@ namespace gc_cli
 
             }, removeArgument);
 
-            runCommand.SetHandler(() => 
+            runCommand.SetHandler(() =>
             {
                 Handlers.Run.Start();
             });
