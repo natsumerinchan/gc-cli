@@ -87,7 +87,5 @@ gc-cli rmpkg keystore
 gc-cli run
 ```
 
-## 提醒
-此软件正处于测试中，并且只编译了 Windows 版本。
-对于有需要的人请自行下载编译其他平台的版本。
+
 
